@@ -104,9 +104,9 @@ class TaskScheduler:
 
 data = ["task1 happy join happy", "task2 like hi hi hi hi", "task3 like dede", "task4 hello hi", "task5 hi"]
 max_tasks = 2
-
+max_time = 9
 node_manager = NodeManager(max_tasks)
-scheduler = TaskScheduler(node_manager,9)
+scheduler = TaskScheduler(node_manager,max_time)
 scheduler.assign_task(data)
 
 while any(node.tasks for node in node_manager.get_nodes()):

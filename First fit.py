@@ -1,5 +1,6 @@
 import threading
 import time
+import statistics
 
 def MapFunction(data):
     cur_results = []
@@ -48,13 +49,13 @@ class Node(threading.Thread):
 
             if task:
                 results,word_count = MapReduce([task])
-                print("Node", self.node_id, "results:", results)
+                # print("Node", self.node_id, "results:", results)
                 time.sleep(word_count)
                 # print("Node", self.node_id, "finished processing task:", task)
             else:
                 time.sleep(1)
 
-        print("Node", self.node_id, "stopped")
+        # print("Node", self.node_id, "stopped")
 
 
 class NodeManager:
@@ -98,22 +99,25 @@ class TaskScheduler:
 
 data = ["task1 happy join happy", "task2 like hi hi hi hi hi", "task3 like dede", "task4 hello hi", "task5 hi", "task6","task7 Once upon a time","task8 in a faraway land there","task9 was a tiny","task11 kingdom"," task12 peaceful prosperous and rich in romance oh", "task13 and tradition nestled in","task14 the heart of","task15 this kingdom was a small village with","task16 an enchanted castle towering high above the clouds the","task17 townsfolk of this village lived a simple life but","task18 they","task19 lived","task20 in fear for","task21 in this castle lived a beast","task22 unlike any other a horrible creature with a","task23 mean streak two","task24 miles wide the villagers lived in terror of","task25 the","task26 beast and would not dare to approach the castle"]
 max_tasks = 2
-preset_time = 10
+preset_time = 12
 num_nodes = 26
 
-node_manager = NodeManager(max_tasks,preset_time,num_nodes)
-scheduler = TaskScheduler(node_manager)
+Node_manager = NodeManager(max_tasks,preset_time,num_nodes)
+scheduler = TaskScheduler(Node_manager)
 scheduler.assign_task(data)
-assigned_nodes = [node for node in node_manager.get_nodes() if node.tasks]
+assigned_nodes = [node for node in Node_manager.get_nodes() if node.tasks]
 print(f"{len(assigned_nodes)} nodes have been assigned tasks.")
+task_counts = [len(node.tasks) for node in Node_manager.get_nodes() if len(node.tasks) > 0]
+stdev_task_count = statistics.stdev(task_counts)
+print("stdev task count per node (only nodes with tasks):", stdev_task_count)
 
-while any(node.tasks for node in node_manager.get_nodes()):
+while any(node.tasks for node in Node_manager.get_nodes()):
     time.sleep(1)
 
-for node in node_manager.get_nodes():
+for node in Node_manager.get_nodes():
     node.should_stop = True
-for node in node_manager.get_nodes():
+for node in Node_manager.get_nodes():
     node.join()
 
-for task in data:
-    print(len(task.split()))
+# for task in data:
+#     print(len(task.split()))
